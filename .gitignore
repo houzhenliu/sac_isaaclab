@@ -148,3 +148,8 @@ tensors*
 
 #test files
 tests/
+feature*
+INSTALL.md
+examples/
+torchcount*
+test_sac

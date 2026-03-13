@@ -1,85 +1,56 @@
-# SAC Configuration for IsaacLab Tasks
-# This is an example configuration file for reference
+# SAC (Soft Actor-Critic) Agent Configuration for Isaac Lab
+# Compatible with sac/train.py
 
-# Seed for reproducibility
 seed: 42
 
-# SAC Agent Configuration
-agent:
-  class: SAC
-  
-  # Training parameters
-  gradient_steps: 1              # Number of gradient updates per environment step
-  batch_size: 256                # Batch size for training
-  discount_factor: 0.99          # Gamma (discount factor)
-  polyak: 0.005                  # Target network update rate (tau)
-  
-  # Learning rates
-  actor_learning_rate: 3.0e-4
-  critic_learning_rate: 3.0e-4
-  entropy_learning_rate: 3.0e-4
-  
-  # Learning schedule
-  learning_rate_scheduler: null
-  learning_rate_scheduler_kwargs: {}
-  
-  # Training schedule
-  random_timesteps: 10000        # Number of random steps before using policy
-  learning_starts: 10000         # Number of steps before starting gradient updates
-  grad_norm_clip: 1.0            # Gradient norm clipping
-  
-  # Entropy parameters
-  auto_entropy_tuning: true      # Automatic entropy tuning
-  initial_entropy_value: 0.2     # Initial entropy coefficient (if not auto)
-  target_entropy: null           # Target entropy (null = -dim(A))
-  
-  # State preprocessing
-  state_preprocessor: null       # State preprocessor (e.g., RunningStandardScaler)
-  state_preprocessor_kwargs: null
-  
-  # Action parameters
-  clip_actions: true
-  exploration_noise: 0.0
-  
-  # Logging
-  experiment:
-    directory: "logs/sac"
-    experiment_name: ""
-    write_interval: 1000
-    checkpoint_interval: 50000
-
-# Replay Buffer Configuration
-memory:
-  class: RandomMemory            # or PrioritizedReplayBuffer
-  memory_size: 1000000           # Replay buffer size
-  
-  # PER parameters (if using PrioritizedReplayBuffer)
-  alpha: 0.6                     # Priority exponent
-  beta: 0.4                      # Importance sampling exponent
-  beta_increment: 0.001          # Beta annealing rate
-  epsilon: 1.0e-6                # Small constant for priorities
-
-# Network Architecture
-networks:
+# Actor-Critic Networks
+network:
   actor:
     hidden_dims: [256, 256]
     activation: relu
     log_std_min: -20.0
     log_std_max: 2.0
-    use_tanh_squashing: true
-    
   critic:
     hidden_dims: [256, 256]
     activation: relu
-    use_layer_norm: false
-    share_features: false
+    # Note: critic takes obs + action concatenated as input
 
-# Training Configuration
-trainer:
-  timesteps: 1000000             # Total training timesteps
-  warmup_timesteps: 10000        # Warmup steps
-  eval_interval: 5000            # Evaluation interval (in steps)
-  eval_episodes: 10              # Number of evaluation episodes
-  save_interval: 50000           # Checkpoint save interval
-  log_interval: 1000             # Logging interval
-  environment_info: log
+# Replay Buffer
+buffer:
+  class: ReplayBuffer  # or PrioritizedReplayBuffer
+  buffer_size: 1000000
+  # For prioritized replay only:
+  prioritized: false
+  alpha: 0.6  # priority exponent
+  beta: 0.4   # importance sampling exponent
+  beta_increment: 0.001
+
+# SAC Agent
+agent:
+  class: SAC
+  actor_lr: 1.0e-3
+  critic_lr: 1.0e-3
+  alpha_lr: 1.0e-3
+  gamma: 0.99
+  tau: 0.005
+  alpha: 0.2
+  automatic_entropy_tuning: true
+  target_entropy: null  # auto-computed as -action_dim if null
+
+# Training
+training:
+  batch_size: 2048
+  warmup_steps: 10000
+  updates_per_step: 1
+  num_steps_per_env: 10000
+  max_iterations: 1000000
+  save_interval: 50
+  log_interval: 10
+  grad_norm_clip: 1.0
+
+# Logging
+experiment:
+  directory: "logs/sac/ant-direct"
+  experiment_name: ""
+  write_interval: 100
+  checkpoint_interval: 5000
