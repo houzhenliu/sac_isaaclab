@@ -1,0 +1,56 @@
+# SAC (Soft Actor-Critic) Agent Configuration for Isaac Lab
+# Compatible with sac/train.py
+
+seed: 42
+
+# Actor-Critic Networks
+network:
+  actor:
+    hidden_dims: [256, 256]
+    activation: relu
+    log_std_min: -20.0
+    log_std_max: 2.0
+  critic:
+    hidden_dims: [256, 256]
+    activation: relu
+    # Note: critic takes obs + action concatenated as input
+
+# Replay Buffer
+buffer:
+  class: ReplayBuffer  # or PrioritizedReplayBuffer
+  buffer_size: 1000000
+  # For prioritized replay only:
+  prioritized: false
+  alpha: 0.6  # priority exponent
+  beta: 0.4   # importance sampling exponent
+  beta_increment: 0.001
+
+# SAC Agent
+agent:
+  class: SAC
+  actor_lr: 1.0e-3
+  critic_lr: 1.0e-3
+  alpha_lr: 1.0e-3
+  gamma: 0.99
+  tau: 0.005
+  alpha: 0.2
+  automatic_entropy_tuning: true
+  target_entropy: null  # auto-computed as -action_dim if null
+
+# Training
+training:
+  batch_size: 2048
+  warmup_steps: 10000
+  updates_per_step: 1
+  num_steps_per_env: 10000
+  max_iterations: 1000000
+  save_interval: 50
+  log_interval: 10
+  grad_norm_clip: 1.0
+
+# Logging
+experiment:
+  directory: "logs/sac/ant-direct"
+  experiment_name: ""
+  write_interval: 100
+  checkpoint_interval: 5000

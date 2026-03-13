@@ -1,0 +1,28 @@
+# Core dependencies - matching IsaacLab and user environment
+numpy<2
+torch>=2.7
+torchvision>=0.14.1
+gymnasium==1.2.1
+skrl>=1.4.3
+
+# Configuration
+hydra-core
+omegaconf
+toml
+
+# Logging and monitoring
+tensorboard
+tqdm
+rich
+prettytable==3.3.0
+
+# Utilities
+packaging<24
+protobuf>=4.25.8,!=5.26.0
+pillow==11.3.0
+
+# Optional: for development
+# pytest
+# black
+# isort
+# flake8
